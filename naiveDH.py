@@ -27,23 +27,54 @@ def bits_to_string(b):
         chars.append(char)
     return "".join(chars).rstrip(chr(0))  # remove trailing 0 characters since we don´t know where the message ends
 
-def encrypt_xtea(key, bits):
+def encrypt_xtea_cfb(key, bits):
     """
-    Hashes the key and encrypts with XTEA
+    Hashes the key and encrypts with XTEA in CFB mode
     :param key: String, key
     :param bits: String of bits
     :return: String of bits (encrypted)
     """
     key_hash = hashlib.sha256(key.encode('utf-8')).digest()[0:16]  # take first 128 bit of hash
-    return xtea.encrypt(key_hash, bits)
+    return xtea.encrypt_cfb(key_hash, bits)
 
 
-def decrypt_xtea(key, bits):
+def decrypt_xtea_cfb(key, bits):
     """
-    Hashes the key and decrypts with XTEA
+    Hashes the key and decrypts with XTEA in CFB mode
     :param key: String, key
     :param bits: String of bits
     :return: String of bits (decrypted)
     """
     key_hash = hashlib.sha256(key.encode('utf-8')).digest()[0:16]  # take first 128 bit of hash
-    return xtea.decrypt(key_hash, bits)
+    return xtea.decrypt_cfb(key_hash, bits)
+
+
+def encrypt_xtea_cbc(key, bits):
+    """
+    Hashes the key and encrypts with XTEA in CBC mode
+    :param key: String, key
+    :param bits: String of bits
+    :return: String of bits (encrypted)
+    """
+    key_hash = hashlib.sha256(key.encode('utf-8')).digest()[0:16]  # take first 128 bit of hash
+    return xtea.encrypt_cbc(key_hash, bits)
+
+
+def decrypt_xtea_cbc(key, bits):
+    """
+    Hashes the key and decrypts with XTEA in CBC mode
+    :param key: String, key
+    :param bits: String of bits
+    :return: String of bits (decrypted)
+    """
+    key_hash = hashlib.sha256(key.encode('utf-8')).digest()[0:16]  # take first 128 bit of hash
+    return xtea.decrypt_cbc(key_hash, bits)
+
+
+enc_cfb = encrypt_xtea_cfb('foobar', string_to_bits('foo'))
+dec_cfb = bits_to_string(decrypt_xtea_cfb('foobar', enc_cfb))
+print(dec_cfb)
+
+enc_cbc = encrypt_xtea_cbc('foobar', string_to_bits('foo'))
+dec_cbc = bits_to_string(decrypt_xtea_cbc('foobar', enc_cbc))
+print(dec_cbc)
