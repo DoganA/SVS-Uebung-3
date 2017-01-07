@@ -69,12 +69,3 @@ def decrypt_xtea_cbc(key, bits):
     """
     key_hash = hashlib.sha256(key.encode('utf-8')).digest()[0:16]  # take first 128 bit of hash
     return xtea.decrypt_cbc(key_hash, bits)
-
-
-enc_cfb = encrypt_xtea_cfb('foobar', string_to_bits('foo'))
-dec_cfb = bits_to_string(decrypt_xtea_cfb('foobar', enc_cfb))
-print(dec_cfb)
-
-enc_cbc = encrypt_xtea_cbc('foobar', string_to_bits('foo'))
-dec_cbc = bits_to_string(decrypt_xtea_cbc('foobar', enc_cbc))
-print(dec_cbc)

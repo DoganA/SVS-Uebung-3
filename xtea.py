@@ -104,13 +104,12 @@ def _encrypt_one_block(key, block):
     _sum = 0
     for i in range(0, NUM_CYCLES):
         v0 += (((v1 << 4) ^ (v1 >> 5)) + v1) ^ (_sum + k[_sum & 3])
-        v0 = v0 & 0xFFFFFFFF
+        v0 = v0 & 0xFFFFFFFF  # simulate uint32_t
         _sum += delta
-        _sum = _sum & 0xFFFFFFFF
+        _sum = _sum & 0xFFFFFFFF  # simulate uint32_t
         v1 += (((v0 << 4) ^ (v0 >> 5)) + v0) ^ (_sum + k[(_sum >> 11) & 3])
-        v1 = v1 & 0xFFFFFFFF
-
-    block = _int_to_bits(v0) + _int_to_bits(v1)
+        v1 = v1 & 0xFFFFFFFF  # simulate uint32_t
+    block = _int_to_32bits(v0) + _int_to_32bits(v1)
     return block
 
 
@@ -131,18 +130,15 @@ def _decrypt_one_block(key, block):
          int.from_bytes(key[12:16], byteorder='big', signed=False)]
     delta = 0x9E3779B9
     _sum = delta * NUM_CYCLES
-    _sum = _sum & 0xFFFFFFFF
+    _sum = _sum & 0xFFFFFFFF  # simulate uint32_t
     for i in range(0, NUM_CYCLES):
         v1 -= (((v0 << 4) ^ (v0 >> 5)) + v0) ^ (_sum + k[(_sum >> 11) & 3])
-        v1 = v1 & 0xFFFFFFFF
+        v1 = v1 & 0xFFFFFFFF  # simulate uint32_t
         _sum -= delta
-        _sum = _sum & 0xFFFFFFFF
+        _sum = _sum & 0xFFFFFFFF  # simulate uint32_t
         v0 -= (((v1 << 4) ^ (v1 >> 5)) + v1) ^ (_sum + k[_sum & 3])
-        v0 = v0 & 0xFFFFFFFF
-    # print(_int_to_bits(v0))  # TODO RMD
-    # print(_int_to_bits(v1))  # TODO RMD
-    block = _int_to_bits(v0) + _int_to_bits(v1)
-
+        v0 = v0 & 0xFFFFFFFF  # simulate uint32_t
+    block = _int_to_32bits(v0) + _int_to_32bits(v1)
     return block
 
 def _split_into_blocks(bits):
@@ -176,10 +172,18 @@ def _xor(a, b):
     return "".join(xor)
 
 
-def _int_to_bits(i):
+def _int_to_32bits(i):
     """
-    Int to bit String
+    Int to 32 bit String
     :param i: Integer
     :return: String of bits
     """
-    return bin(i)[2:]
+    bin_str = bin(i)[2:]
+
+    if len(bin_str) >= 32:
+        return bin_str[:32]
+    else:
+        pad = '0' * (32 - len(bin_str) % 32)
+        bin_str = pad + bin_str
+    return bin_str
+
