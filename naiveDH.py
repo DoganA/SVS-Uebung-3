@@ -33,8 +33,8 @@ class NaiveDH(smtpd.SMTPServer):
             print('BOB: Hi! Waiting for messages...')
 
         if args.s:  # SEND MODE
-            self.DHKE_P = 23
-            self.DHKE_G = 17
+            self.DHKE_P = 439351292910452432574786963588089477522344331
+            self.DHKE_G = 1747822896920092227343
             self.partner_addr = args.s.split(':')[0]
             self.partner_port = args.s.split(':')[1]
             self.message = args.message
@@ -86,7 +86,6 @@ class NaiveDH(smtpd.SMTPServer):
     def send_message(self, type, payload):
         self.threadPool.apply_async(send_message_thread, [type, payload, self.partner_addr, self.partner_port])
 
-
 def send_message_thread(type, payload, addr, port):
     b64payload = base64.b64encode(pickle.dumps({'type': type, 'payload': payload}))
     msg = MIMEText(b64payload.decode())
@@ -95,7 +94,6 @@ def send_message_thread(type, payload, addr, port):
     _smtp = smtplib.SMTP(addr, port)
     _smtp.sendmail('FROM', 'TO', msg.as_string())
     _smtp.quit()
-
 
 def string_to_bits(s):
     """
@@ -108,7 +106,6 @@ def string_to_bits(s):
         bin_t = bin(ord(c))[2:]  # remove 0b header
         bits.append(bin_t.zfill(8))  # pad to 8 bit
     return "".join(bits)
-
 
 def bits_to_string(b):
     """
